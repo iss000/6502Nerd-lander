@@ -1,30 +1,19 @@
 .zero
-#ifdef __CC65__
+
 #define tmp0 atmp0
 #define tmp1 atmp1
 #define tmp2 atmp2
 #define tmp3 atmp3
-#define tmp4 atmp4
+
 atmp0         .dsb  2
 atmp1         .dsb  2
 atmp2         .dsb  2
 atmp3         .dsb  2
-atmp4         .dsb  2
-#endif
 
-#ifdef __VBCC__
-#define tmp0 atmp0
-atmp0         .dsb  2
-#endif
+tmpP          .dsb  1
 
-#ifdef __LLVM_MOS__
-#define tmp0 atmp0
-atmp0         .dsb  2
-#endif
+.bss
 
-.data
-
-__mgr_m       .dsb  2
 __mgr_x       .dsb  2
 __mgr_y       .dsb  2
 __mgr_s       .dsb  2
@@ -36,9 +25,14 @@ __mgr_s       .dsb  2
 
 #include "dflat_library.s"
 
+.bss
+
+_plotShip_ret .dsb  2
+
+
 .text
 
-_plotShip
+__plotShip
 ;           @ plot ox,oy,a$
               ldx   _ox
               ldy   _oy
@@ -148,7 +142,8 @@ _plotShip
               lda   _a
               jsr   gr_hchar
               lda   _xx
-              clc:adc #6
+              clc
+              adc #6
               tax
               ldy   _yy
               lda   _a+1
@@ -157,14 +152,12 @@ _plotShip
 ;           @ return int - low = X, high = A
               pla
               tax
+              stx   _plotShip_ret
               lda   #0
+              sta   _plotShip_ret+1
               rts
 
 .data
-
-tmpP
-              .byt  1
-
 
 ;           @
 ;           @ Graphics data - char number followed by 8 bytes of data

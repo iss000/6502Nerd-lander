@@ -23,6 +23,9 @@
 
 .bss
 
+_kb_stick_ret
+              .dsb  1
+
 ; Text address tables
 textAddrLow
               .dsb  28
@@ -120,7 +123,7 @@ maskTableInit_skip
 _gr_pixmode
 ;       ldy #0
 ;       lda (sp),y                              ; Access pixmode parameter
-              lda   __mgr_m
+              lda   __mgr_x
               sta   screenPixMode
               rts
 
@@ -322,27 +325,27 @@ gr_hchar_mask ; Calculate how many shifts to tmp
               ldy   #7
 gr_hchar_getfont
               lda   (tmp0),y
-              sta   tmp4
+              sta   tmp3
               lda   #0
-              sta   tmp4+1
+              sta   tmp3+1
 
 ;           @ shift the right number of times
               ldx   screenTmp
 gr_hchar_rot1bit
               dex
               beq   gr_hchar_rot1bit_nx
-              lsr   tmp4                ; Rotate left hand side
-              lda   tmp4+1              ; Rotate right hand side
+              lsr   tmp3                ; Rotate left hand side
+              lda   tmp3+1              ; Rotate right hand side
               bcc   gr_hchar_rot1bit_bcc
               ora   #$40                ; account for 6 bits per byte
 gr_hchar_rot1bit_bcc
               lsr
-              sta   tmp4+1
+              sta   tmp3+1
               bpl   gr_hchar_rot1bit    ; Always as lsr sets N=0
 gr_hchar_rot1bit_nx
-              lda   tmp4+1              ; Get RHS
+              lda   tmp3+1              ; Get RHS
               pha                       ; Push RHS on to stack
-              lda   tmp4                ; Get LHS
+              lda   tmp3                ; Get LHS
               pha                       ; Push that too - LH gets pulled first
               dey                       ; Bottom to to lines
               bpl   gr_hchar_getfont
@@ -379,15 +382,15 @@ gr_hchar_copyline_erase
 ;           @ Mode = Z : erase
               ldy   #0                  ; Get lh side source
               pla
-              sta   tmp4
+              sta   tmp3
               ora   (screenAddr),y
-              eor   tmp4
+              eor   tmp3
               sta   (screenAddr),y
               iny                       ; Get rh side source
               pla
-              sta   tmp4
+              sta   tmp3
               ora   (screenAddr),y
-              eor   tmp4
+              eor   tmp3
               sta   (screenAddr),y
 gr_hchar_copyline_nx
               clc                       ; Next address
@@ -531,7 +534,7 @@ KB_IJK        =     %00100000           ; IJK joystick detect bit
 ;* A = Returns bit mask of keys pressed
 ;* Y corrupted, X=0
 ;****************************************
-_kb_stick
+__kb_stick
               php
               sei
 ;           @ Select Row 4 only, all keys on this row
@@ -559,6 +562,7 @@ kb_stick_pos
               bpl   kb_stick_pos        ; Do all 5 positions
               pla                       ; Result in X
               tax
+              stx   _kb_stick_ret
               plp
               rts
 

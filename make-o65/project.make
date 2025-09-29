@@ -67,7 +67,7 @@ lander_NAME         :=
 lander_DEFS         :=
 lander_AFLAGS       := $(XXXFLAGS)
 lander_CFLAGS       := $(XXXFLAGS)
-lander_LFLAGS       :=
+lander_LFLAGS       := -D__ZPSIZE__=0x50
 
 # X_DEFS              += -DUSE_ROMCALLS
 # X_DEFS              += -DUSE_VSYNC

@@ -15,7 +15,6 @@ void xprintf_outbyte(int c)
 #endif
 #endif
 
-extern int _mgr_m __asm__("__mgr_m");
 extern int _mgr_x __asm__("__mgr_x");
 extern int _mgr_y __asm__("__mgr_y");
 extern char* _mgr_s __asm__("__mgr_s");
@@ -23,7 +22,7 @@ extern char* _mgr_s __asm__("__mgr_s");
 void gr_init(void) __asm__("_gr_init");
 // void gr_pixmode(int mode);
 void _gr_pixmode(void) __asm__("__gr_pixmode");
-#define gr_pixmode(mode) do{_mgr_m=mode,_gr_pixmode();}while(0)
+#define gr_pixmode(mode) do{_mgr_x=(mode),_gr_pixmode();}while(0)
 // void gr_hplot(int x, int y, char* s);
 void _gr_hplot(void) __asm__("__gr_hplot");
 #define gr_hplot(x,y,s) do{_mgr_x=(x),_mgr_y=(y),_mgr_s=(char*)(s),_gr_hplot();}while(0)
@@ -34,17 +33,24 @@ void _gr_tplot(void) __asm__("__gr_tplot");
 void _gr_plot(void) __asm__("__gr_plot");
 #define gr_plot(x,y,s) do{_mgr_x=(x),_mgr_y=(y),_mgr_s=(char*)(s),_gr_plot();}while(0)
 
-unsigned char kb_stick(void) __asm__("_kb_stick");
+extern unsigned char kb_stick_ret __asm__("_kb_stick_ret");
+// unsigned char kb_stick(void) __asm__("_kb_stick");
+void _kb_stick(void) __asm__("__kb_stick");
+#define kb_stick() (_kb_stick(),kb_stick_ret)
 
-unsigned char plotShip(void) __asm__("_plotShip");
+extern unsigned int plotShip_ret __asm__("_plotShip_ret");
+// unsigned char plotShip(void) __asm__("_plotShip");
+void _plotShip(void) __asm__("__plotShip");
+#define plotShip() (_plotShip(),plotShip_ret)
+
 extern unsigned char udgData[] __asm__("_udgData");
 
-int ox __asm__("_ox");
-int oy __asm__("_oy");
-int xx __asm__("_xx");
-int yy __asm__("_yy");
-char a[5] __asm__("_a");
-char b[5] __asm__("_b");
+int ox __asm__("_ox") = 0;
+int oy __asm__("_oy") = 0;
+int xx __asm__("_xx") = 0;
+int yy __asm__("_yy") = 0;
+char a[5] __asm__("_a") = {0,0,0,0,0};
+char b[5] __asm__("_b") = {0,0,0,0,0};
 
 static char t[40];
 static char floating[5],thrustUp[5],thrustLeft[5],thrustRight[5];
