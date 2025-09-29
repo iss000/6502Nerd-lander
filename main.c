@@ -1,8 +1,14 @@
 #ifdef __O65__
 #include <compat.h>
 #include <trand.h>
+#include <xprintf.h>
 #define srandom(x) trandseed(x)
 #define srand(x) trand()
+#define sprintf xsprintf
+void xprintf_outbyte(int c)
+{
+  putchar(c);
+}
 #else
 #ifdef __OSDK__
 #include "lib.h"

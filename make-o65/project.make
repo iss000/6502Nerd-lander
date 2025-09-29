@@ -60,7 +60,7 @@ XXXFLAGS            += -DUSE_ROMCALLS
 # XXXFLAGS            += -DUSE_DSND_DELAY=16
 
 # # #
-lander_SRC          := compat.s main_asm.s main.c trand.s
+lander_SRC          := compat.s main.c main_asm.s trand.s xprintf.c
 lander_ORG          := 0x0600
 lander_AUTO         := 1
 lander_NAME         :=
