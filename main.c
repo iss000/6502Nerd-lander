@@ -77,7 +77,8 @@ int main(void)
 {
   gr_init();
   init();
-  while(state<3) // forever...
+  // loop forever but no compiler warning ...
+  while(state<3)
   {
     if(state==0) attract();
     if(state==1) initGame();
