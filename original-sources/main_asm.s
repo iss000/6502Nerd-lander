@@ -1,42 +1,4 @@
-.zero
-#ifdef __CC65__
-#define tmp0 atmp0
-#define tmp1 atmp1
-#define tmp2 atmp2
-#define tmp3 atmp3
-#define tmp4 atmp4
-atmp0         .dsb  2
-atmp1         .dsb  2
-atmp2         .dsb  2
-atmp3         .dsb  2
-atmp4         .dsb  2
-#endif
-
-#ifdef __VBCC__
-#define tmp0 atmp0
-atmp0         .dsb  2
-#endif
-
-#ifdef __LLVM_MOS__
-#define tmp0 atmp0
-atmp0         .dsb  2
-#endif
-
-.data
-
-__mgr_m       .dsb  2
-__mgr_x       .dsb  2
-__mgr_y       .dsb  2
-__mgr_s       .dsb  2
-
-#define _gr_pixmode __gr_pixmode
-#define _gr_hplot   __gr_hplot
-#define _gr_tplot   __gr_tplot
-#define _gr_plot   __gr_plot
-
 #include "dflat_library.s"
-
-.text
 
 _plotShip
 ;           @ plot ox,oy,a$
@@ -159,9 +121,6 @@ _plotShip
               tax
               lda   #0
               rts
-
-.data
-
 tmpP
               .byt  1
 

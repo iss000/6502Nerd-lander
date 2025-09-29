@@ -21,8 +21,6 @@
 
 #define screenMode $21f
 
-.bss
-
 ; Text address tables
 textAddrLow
               .dsb  28
@@ -41,8 +39,6 @@ hiresColumn
 ; HIres x coord to pixel mask
 hires_mask
               .dsb  240
-
-.text
 
 ; Call this routine to initialise the graphics system
 _gr_init
@@ -118,9 +114,8 @@ maskTableInit_skip
 
 ; Set the pixmode
 _gr_pixmode
-;       ldy #0
-;       lda (sp),y                              ; Access pixmode parameter
-              lda   __mgr_m
+              ldy   #0
+              lda   (sp),y              ; Access pixmode parameter
               sta   screenPixMode
               rts
 
@@ -137,9 +132,8 @@ _gr_plot
 
 ;           @ In text mode
 _gr_tplot
-;       ldy #2
-;       lda (sp),y                              ; Access Y coordinate
-              lda   __mgr_y
+              ldy   #2
+              lda   (sp),y              ; Access Y coordinate
               tax
               lda   screenMode
               beq   tplot_skip_hires
@@ -151,9 +145,8 @@ _gr_tplot
 tplot_skip_hires
               lda   textAddrLow,x       ; Get the LOW part of the screen adress
               clc                       ; Clear the carry (because we will do an addition after)
-;       ldy #0
-;       adc (sp),y                              ; Add X coordinate
-              adc   __mgr_x
+              ldy   #0
+              adc   (sp),y              ; Add X coordinate
               sta   write+1
               sta   plot_single_text_char+1
               lda   textAddrHigh,x      ; Get the HIGH part of the screen adress
@@ -161,19 +154,17 @@ tplot_skip_hires
               sta   write+2
               sta   plot_single_text_char+2
 
-;       ldy #4
-;       lda (sp),y
-              lda   __mgr_s
+              ldy   #4
+              lda   (sp),y
               sta   read+1
-;       iny
-;       lda (sp),y
-              lda   __mgr_s+1
+              iny
+              lda   (sp),y
               sta   read+2
               beq   single_text_char    ; If high byte is zero then only one char to plot
 ;           @ Start at the first character
               ldx   #0
 loop_char
-;           @ Read the character, exit if it`s a 0
+;           @ Read the character, exit if it's a 0
 read
               lda   $0123,x
               beq   end_loop_char
@@ -201,28 +192,24 @@ plot_single_text_char
 ; sp+4 => char code
 ;
 _gr_hplot
-;       ldy #2
-;       lda (sp),y                              ; Access Y coordinate
-              lda   __mgr_y
+              ldy   #2
+              lda   (sp),y              ; Access Y coordinate
               pha
-;       ldy #0
-;       lda (sp),y                              ; Access X coordinate
-              lda   __mgr_x
+              ldy   #0
+              lda   (sp),y              ; Access X coordinate
               pha
-;       ldy #4
-;       lda (sp),y                              ; Access char pointer
-              lda   __mgr_s
+              ldy   #4
+              lda   (sp),y              ; Access char pointer
               sta   tmp1
-;       iny
-;       lda (sp),y
-              lda   __mgr_s+1
+              iny
+              lda   (sp),y
               sta   tmp1+1
               pla
               tax
               pla
               tay
 ;           @ Now X in X, Y in Y, char code in A
-;           @ If pointer high is zero then it`s a direct char code
+;           @ If pointer high is zero then it's a direct char code
               lda   tmp1+1
               bne   gr_hchar_ptr
               lda   tmp1
@@ -601,7 +588,6 @@ snd_set_reg
               pla
               rts
 
-.data
 
 kb_stick_mask
               .byt  %11011111           ; Left  = Bit 0
