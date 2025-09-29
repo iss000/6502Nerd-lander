@@ -21,6 +21,8 @@
 
 #define screenMode $21f
 
+.bss
+
 ; Text address tables
 textAddrLow
 	.dsb 28
@@ -39,6 +41,8 @@ hiresColumn
 ; HIres x coord to pixel mask
 hires_mask
 	.dsb 240
+
+.text
 
 ; Call this routine to initialise the graphics system
 _gr_init
@@ -131,7 +135,7 @@ _gr_plot
 	bne _gr_hplot
 
 	; In text mode
-_gr_tplot	
+_gr_tplot
 	ldy #2
 	lda (sp),y				; Access Y coordinate
 	tax
@@ -142,7 +146,7 @@ _gr_tplot
 	clc
 	adc #25
 	tax
-tplot_skip_hires	
+tplot_skip_hires
 	lda textAddrLow,x		; Get the LOW part of the screen adress
 	clc						; Clear the carry (because we will do an addition after)
 	ldy #0
@@ -151,7 +155,7 @@ tplot_skip_hires
 	sta plot_single_text_char+1
 	lda textAddrHigh,x		; Get the HIGH part of the screen adress
 	adc #0					; Eventually add the carry to complete the 16 bits addition
-	sta write+2				
+	sta write+2
 	sta plot_single_text_char+2
 
 	ldy #4
@@ -164,7 +168,7 @@ tplot_skip_hires
 	; Start at the first character
 	ldx #0
 loop_char
-	; Read the character, exit if it's a 0
+	; Read the character, exit if it`s a 0
 read
 	lda $0123,x
 	beq end_loop_char
@@ -173,7 +177,7 @@ write
 	sta $0123,x
 	; Next character, and loop
 	inx
-	bne loop_char  
+	bne loop_char
 	; Finished !
 end_loop_char
 	rts
@@ -182,7 +186,7 @@ single_text_char
 plot_single_text_char
 	sta $0123
 	rts
-	
+
 
 ; gr_hplot
 ; Plot character to hires X,Y coordinates with char code A
@@ -209,7 +213,7 @@ _gr_hplot
 	pla
 	tay
 	; Now X in X, Y in Y, char code in A
-	; If pointer high is zero then it's a direct char code
+	; If pointer high is zero then it`s a direct char code
 	lda tmp1+1
 	bne gr_hchar_ptr
 	lda tmp1
@@ -581,13 +585,14 @@ snd_set_reg
 
 	sta SND_ADBUS			; Put reg value on Port A (sound bus)
 	lda #SND_SELWRITE		; Select mode for writing data
-	sta SND_MODE			; Latch reg value on Port A	
+	sta SND_MODE			; Latch reg value on Port A
 	lda #SND_DESELECT		; Deselect AY
 	sta SND_MODE
 
 	pla
 	rts
 
+.data
 
 kb_stick_mask
 	.byt %11011111		; Left 	= Bit 0

@@ -1,23 +1,52 @@
+#ifdef __O65__
+#include <compat.h>
+#include <trand.h>
+#define srandom(x) trandseed(x)
+#define srand(x) trand()
+#else
+#ifdef __OSDK__
 #include "lib.h"
+#endif
+#endif
 
-void gr_hplot(int x, int y, char *s);
-void gr_tplot(int x, int y, char *s);
-void gr_plot(int x, int y, char *s);
-void gr_pixmode(int mode);
-unsigned char kb_stick();
+void gr_init(void) __asm__("_gr_init");
+void gr_pixmode(int mode) __asm__("_gr_pixmode");
+void gr_hplot(int x, int y, char* s) __asm__("_gr_hplot");
+void gr_tplot(int x, int y, char* s) __asm__("_gr_tplot");
+void gr_plot(int x, int y, char* s) __asm__("_gr_plot");
 
-unsigned char plotShip();
-extern unsigned char udgData[];
+unsigned char kb_stick(void) __asm__("_kb_stick");
+
+unsigned char plotShip(void) __asm__("_plotShip");
+extern unsigned char udgData[] __asm__("_udgData");
 
 char t[40];
-char a[5],b[5],floating[5],thrustUp[5],thrustLeft[5],thrustRight[5];
+char a[5] __asm__("_a");
+char b[5] __asm__("_b");
+char floating[5],thrustUp[5],thrustLeft[5],thrustRight[5];
 int padLeft,padTop;
 int score,level,fuel,hiscore;
-int ox,oy,x,y,dx,dy,s,p,xx,yy,oxx,oyy;
+int ox __asm__("_ox");
+int oy __asm__("_oy");
+int xx __asm__("_xx");
+int yy __asm__("_yy");
+int x,y,dx,dy,s,p,oxx,oyy;
 int g,sx,sy;
 unsigned char state=0;
 
-void main()
+// Local forward declarations
+static void init(void);
+static void attract(void);
+static void initGame(void);
+static void showStatus(void);
+static void drawObstacles(void);
+static void playGame(void);
+static void doWon(void);
+static void doCrash(void);
+static void checkHighScore(void);
+static void wait(int n);
+
+int main(void)
 {
   gr_init();
   init();
@@ -27,9 +56,10 @@ void main()
    if(state==1) initGame();
    if(state==2) playGame();
   }
+  return 0;
 }
 
-int init()
+static void init(void)
 {
   unsigned char c,d;
   int i,j;
@@ -55,9 +85,9 @@ int init()
   padLeft=220;
   padTop=188;
   score=0;level=0;fuel=0;hiscore=0;
-} 
+}
 
-int attract()
+static void attract(void)
 {
   int r=0;
 
@@ -80,7 +110,7 @@ int attract()
   state=1;
 }
 
-int initGame()
+static void initGame(void)
 {
   hires();poke(0x26A,10);
   fuel=500;
@@ -91,7 +121,7 @@ int initGame()
 }
 
 
-int showStatus()
+static void showStatus(void)
 {
   sprintf(t,"\1FUEL:%d ",fuel); t[9]=0; gr_tplot(1,0,t);
   sprintf(t,"\3LEVEL:%d ",level); t[9]=0; gr_tplot(15,0,t);
@@ -101,7 +131,7 @@ int showStatus()
 }
 
 
-int drawObstacles()
+static void drawObstacles(void)
 {
   int i,x,y;
 
@@ -124,7 +154,7 @@ int drawObstacles()
   }
 }
 
-int playGame()
+static void playGame(void)
 {
   int delay;
 
@@ -183,7 +213,7 @@ int playGame()
 }
 
 
-int doWon()
+static void doWon(void)
 {
   ping();
   gr_tplot(13,2,"LANDED SAFELY!");
@@ -193,7 +223,7 @@ int doWon()
 }
 
 
-int doCrash()
+static void doCrash(void)
 {
   int i;
   gr_tplot( 8,2,"YOU DESTROYED THE CRAFT");
@@ -210,7 +240,7 @@ int doCrash()
   checkHighScore();
 }
 
-int checkHighScore()
+static void checkHighScore(void)
 {
   if(score>hiscore) {
     hiscore=score;
@@ -220,7 +250,7 @@ int checkHighScore()
   }
 }
 
-int wait(int n)
+static void wait(int n)
 {
   int i;
   for(i=0;i<n*20;i++);
