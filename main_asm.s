@@ -1,29 +1,25 @@
 .zero
 #ifdef __CC65__
-sp      .dsb 2
-atmp0   .dsb 2
-atmp1   .dsb 2
-atmp2   .dsb 2
-atmp3   .dsb 2
-atmp4   .dsb 2
-
 #define tmp0 atmp0
 #define tmp1 atmp1
 #define tmp2 atmp2
 #define tmp3 atmp3
 #define tmp4 atmp4
+atmp0   .dsb 2
+atmp1   .dsb 2
+atmp2   .dsb 2
+atmp3   .dsb 2
+atmp4   .dsb 2
 #endif
 
 #ifdef __VBCC__
-atmp0   .dsb 2
-
 #define tmp0 atmp0
+atmp0   .dsb 2
 #endif
 
 #ifdef __LLVM_MOS__
-atmp0   .dsb 2
-
 #define tmp0 atmp0
+atmp0   .dsb 2
 #endif
 
 .bss

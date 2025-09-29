@@ -9,40 +9,36 @@
 #endif
 #endif
 
-void gr_init(void) __asm__("_gr_init");
-
 extern int _mgr_m __asm__("__mgr_m");
 extern int _mgr_x __asm__("__mgr_x");
 extern int _mgr_y __asm__("__mgr_y");
 extern char* _mgr_s __asm__("__mgr_s");
 
+void gr_init(void) __asm__("_gr_init");
 // void gr_pixmode(int mode);
 void _gr_pixmode(void) __asm__("__gr_pixmode");
 #define gr_pixmode(mode) do{_mgr_m=mode,_gr_pixmode();}while(0)
-
 // void gr_hplot(int x, int y, char* s);
 void _gr_hplot(void) __asm__("__gr_hplot");
-#define gr_hplot(x,y,s) do{_mgr_x=(x),_mgr_y=(y),_mgr_s=(s),_gr_hplot();}while(0)
-
+#define gr_hplot(x,y,s) do{_mgr_x=(x),_mgr_y=(y),_mgr_s=(char*)(s),_gr_hplot();}while(0)
 // void gr_tplot(int x, int y, char* s);
 void _gr_tplot(void) __asm__("__gr_tplot");
-#define gr_tplot(x,y,s) do{_mgr_x=(x),_mgr_y=(y),_mgr_s=(s),_gr_tplot();}while(0)
-
+#define gr_tplot(x,y,s) do{_mgr_x=(x),_mgr_y=(y),_mgr_s=(char*)(s),_gr_tplot();}while(0)
 // void gr_plot(int x, int y, char* s);
 void _gr_plot(void) __asm__("__gr_plot");
-#define gr_plot(x,y,s) do{_mgr_x=(x),_mgr_y=(y),_mgr_s=(s),_gr_plot();}while(0)
+#define gr_plot(x,y,s) do{_mgr_x=(x),_mgr_y=(y),_mgr_s=(char*)(s),_gr_plot();}while(0)
 
 unsigned char kb_stick(void) __asm__("_kb_stick");
 
 unsigned char plotShip(void) __asm__("_plotShip");
 extern unsigned char udgData[] __asm__("_udgData");
 
-char a[5] __asm__("_a");
-char b[5] __asm__("_b");
 int ox __asm__("_ox");
 int oy __asm__("_oy");
 int xx __asm__("_xx");
 int yy __asm__("_yy");
+char a[5] __asm__("_a");
+char b[5] __asm__("_b");
 
 static char t[40];
 static char floating[5],thrustUp[5],thrustLeft[5],thrustRight[5];
@@ -67,10 +63,9 @@ static void wait(int n);
 
 int main(void)
 {
-  static char quit = 0;
   gr_init();
   init();
-  while(!quit)
+  while(state<3) // forever...
   {
     if(state==0) attract();
     if(state==1) initGame();
@@ -89,6 +84,7 @@ static void init(void)
   hires();
   poke(0x26A,10);
   gr_hplot(6,0,"\14INITIALISING..PLEASE WAIT");
+  while(1);
   i=0;
   // Set up character graphics
   while(udgData[i]!=0)
