@@ -10,29 +10,48 @@
 #endif
 
 void gr_init(void) __asm__("_gr_init");
-void gr_pixmode(int mode) __asm__("_gr_pixmode");
-void gr_hplot(int x, int y, char* s) __asm__("_gr_hplot");
-void gr_tplot(int x, int y, char* s) __asm__("_gr_tplot");
-void gr_plot(int x, int y, char* s) __asm__("_gr_plot");
+
+extern int _mgr_m __asm__("__mgr_m");
+extern int _mgr_x __asm__("__mgr_x");
+extern int _mgr_y __asm__("__mgr_y");
+extern char* _mgr_s __asm__("__mgr_s");
+
+// void gr_pixmode(int mode);
+void _gr_pixmode(void) __asm__("__gr_pixmode");
+#define gr_pixmode(mode) do{_mgr_m=mode,_gr_pixmode();}while(0)
+
+// void gr_hplot(int x, int y, char* s);
+void _gr_hplot(void) __asm__("__gr_hplot");
+#define gr_hplot(x,y,s) do{_mgr_x=(x),_mgr_y=(y),_mgr_s=(s),_gr_hplot();}while(0)
+
+// void gr_tplot(int x, int y, char* s);
+void _gr_tplot(void) __asm__("__gr_tplot");
+#define gr_tplot(x,y,s) do{_mgr_x=(x),_mgr_y=(y),_mgr_s=(s),_gr_tplot();}while(0)
+
+// void gr_plot(int x, int y, char* s);
+void _gr_plot(void) __asm__("__gr_plot");
+#define gr_plot(x,y,s) do{_mgr_x=(x),_mgr_y=(y),_mgr_s=(s),_gr_plot();}while(0)
 
 unsigned char kb_stick(void) __asm__("_kb_stick");
 
 unsigned char plotShip(void) __asm__("_plotShip");
 extern unsigned char udgData[] __asm__("_udgData");
 
-char t[40];
 char a[5] __asm__("_a");
 char b[5] __asm__("_b");
-char floating[5],thrustUp[5],thrustLeft[5],thrustRight[5];
-int padLeft,padTop;
-int score,level,fuel,hiscore;
 int ox __asm__("_ox");
 int oy __asm__("_oy");
 int xx __asm__("_xx");
 int yy __asm__("_yy");
-int x,y,dx,dy,s,p,oxx,oyy;
-int g,sx,sy;
-unsigned char state=0;
+
+static char t[40];
+static char floating[5],thrustUp[5],thrustLeft[5],thrustRight[5];
+static int padLeft,padTop;
+static int score,level,fuel,hiscore;
+static int x,y,dx,dy,s,p;
+// static int oxx,oyy;
+static int g,sx,sy;
+static unsigned char state=0;
 
 // Local forward declarations
 static void init(void);
@@ -48,13 +67,14 @@ static void wait(int n);
 
 int main(void)
 {
+  static char quit = 0;
   gr_init();
   init();
-  while(1)
+  while(!quit)
   {
-   if(state==0) attract();
-   if(state==1) initGame();
-   if(state==2) playGame();
+    if(state==0) attract();
+    if(state==1) initGame();
+    if(state==2) playGame();
   }
   return 0;
 }
@@ -64,15 +84,17 @@ static void init(void)
   unsigned char c,d;
   int i,j;
 
-  paper(4);ink(3);
-  hires();poke(0x26A,10);
+  paper(4);
+  ink(3);
+  hires();
+  poke(0x26A,10);
   gr_hplot(6,0,"\14INITIALISING..PLEASE WAIT");
   i=0;
   // Set up character graphics
   while(udgData[i]!=0)
   {
     c=udgData[i++];
-    for(j=0;j<8;j++)
+    for(j=0; j<8; j++)
     {
       d=udgData[i++];
       poke(0x9800+8*c+j,d);
@@ -84,14 +106,18 @@ static void init(void)
   strcpy(thrustRight,"\52\53");
   padLeft=220;
   padTop=188;
-  score=0;level=0;fuel=0;hiscore=0;
+  score=0;
+  level=0;
+  fuel=0;
+  hiscore=0;
 }
 
 static void attract(void)
 {
   int r=0;
 
-  hires();poke(0x26A,10);
+  hires();
+  poke(0x26A,10);
   showStatus();
   gr_hplot(48,10, "\5Oric Lander in C-lang");
   gr_hplot(24,30, "Land your spacecraft on the base");
@@ -112,9 +138,13 @@ static void attract(void)
 
 static void initGame(void)
 {
-  hires();poke(0x26A,10);
+  hires();
+  poke(0x26A,10);
   fuel=500;
-  g=2;sx=2;sy=6;p=0;
+  g=2;
+  sx=2;
+  sy=6;
+  p=0;
   showStatus();
   drawObstacles();
   state=2;
@@ -123,11 +153,21 @@ static void initGame(void)
 
 static void showStatus(void)
 {
-  sprintf(t,"\1FUEL:%d ",fuel); t[9]=0; gr_tplot(1,0,t);
-  sprintf(t,"\3LEVEL:%d ",level); t[9]=0; gr_tplot(15,0,t);
-  sprintf(t,"\2SCORE:%d ",score); t[10]=0; gr_tplot(28,0,t);
-  sprintf(t,"\2SCORE:%d ",score); t[10]=0; gr_tplot(28,0,t);
-  sprintf(t,"\5HI SCORE:%d ",hiscore); t[14]=0; gr_tplot(12,1,t);
+  sprintf(t,"\1FUEL:%d ",fuel);
+  t[9]=0;
+  gr_tplot(1,0,t);
+  sprintf(t,"\3LEVEL:%d ",level);
+  t[9]=0;
+  gr_tplot(15,0,t);
+  sprintf(t,"\2SCORE:%d ",score);
+  t[10]=0;
+  gr_tplot(28,0,t);
+  sprintf(t,"\2SCORE:%d ",score);
+  t[10]=0;
+  gr_tplot(28,0,t);
+  sprintf(t,"\5HI SCORE:%d ",hiscore);
+  t[14]=0;
+  gr_tplot(12,1,t);
 }
 
 
@@ -135,76 +175,103 @@ static void drawObstacles(void)
 {
   int i,x,y;
 
-  for(i=0;i<=3;i++)
+  for(i=0; i<=3; i++)
   {
     curset(i,i,1);
-    draw(239-i-i,0,1); draw(0,199-i-i,1);
-    draw(-(239-i-i),0,1); draw(0,-(199-i-i),1);
+    draw(239-i-i,0,1);
+    draw(0,199-i-i,1);
+    draw(-(239-i-i),0,1);
+    draw(0, -(199-i-i),1);
   }
 
   curset(padLeft,padTop+7,1);
   draw(239-padLeft,0,1);
 
   gr_pixmode(-1);
-  for(i=0;i<20+level*10;i++)
+  for(i=0; i<20+level*10; i++)
   {
-    x=((unsigned int)rand())%210+15;y=((unsigned int)(rand()))%180+10;
-    if ((x>25 || y>25) && (x<(padLeft-6) || y<(padTop-8)))
+    x=((unsigned int)rand())%210+15;
+    y=((unsigned int)(rand()))%180+10;
+    if((x>25 || y>25) && (x<(padLeft-6) || y<(padTop-8)))
       gr_hplot(x,y,"/");
   }
 }
 
 static void playGame(void)
 {
-  int delay;
+  // int delay;
 
-  play(0,0,0,0);sound(0,16,0);sound(1,1,10);
-  x=4<<6;y=4<<6;dx=0;dy=0;
-  xx=x>>6;yy=y>>6;
-  strcpy(a,floating); strcpy(b,a);
-  gr_pixmode(-1); gr_hplot(xx,yy,a);
+  play(0,0,0,0);
+  sound(0,16,0);
+  sound(1,1,10);
+  x=4<<6;
+  y=4<<6;
+  dx=0;
+  dy=0;
+  xx=x>>6;
+  yy=y>>6;
+  strcpy(a,floating);
+  strcpy(b,a);
+  gr_pixmode(-1);
+  gr_hplot(xx,yy,a);
   do
   {
-    ox=xx;oy=yy;
+    ox=xx;
+    oy=yy;
     dy=dy+g;
-    if (dy>=128) dy=128;
-    if (dy<=-128) dy=-128;
-    if (dx>=128) dx=128;
-    if (dx<=-128) dx=-128;
-    y=y+dy;x=x+dx;
+    if(dy>=128) dy=128;
+    if(dy<=-128) dy=-128;
+    if(dx>=128) dx=128;
+    if(dx<=-128) dx=-128;
+    y=y+dy;
+    x=x+dx;
     s=kb_stick();
-    if ((s&7)&&(fuel>0))
+    if((s&7)&&(fuel>0))
     {
       play(0,1,0,0);
-      if (s&4) {
-        dy=dy-sy; strcpy(b,thrustUp);fuel=fuel-2;
+      if(s&4)
+      {
+        dy=dy-sy;
+        strcpy(b,thrustUp);
+        fuel=fuel-2;
       }
-      else if (s&1) {
-        dx=dx-sx; strcpy(b,thrustLeft);fuel=fuel-1;
+      else if(s&1)
+      {
+        dx=dx-sx;
+        strcpy(b,thrustLeft);
+        fuel=fuel-1;
       }
-      else if (s&2) {
-        dx=dx+sx; strcpy(b,thrustRight);fuel=fuel-1;
+      else if(s&2)
+      {
+        dx=dx+sx;
+        strcpy(b,thrustRight);
+        fuel=fuel-1;
       }
-      if (fuel<0) fuel=0;
-      sprintf(t,"%d   ",fuel);t[4]=0;
+      if(fuel<0) fuel=0;
+      sprintf(t,"%d   ",fuel);
+      t[4]=0;
       gr_tplot(7,0,t);
     }
-    else {
+    else
+    {
       strcpy(b,floating);
       play(0,0,0,0);
     }
-    xx=x>>6;yy=y>>6;
+    xx=x>>6;
+    yy=y>>6;
     if((xx!=ox)||(yy!=oy)||(strcmp(a,b)))
       p=plotShip();
     wait(2);
-  } while (!p);
+  }
+  while(!p);
   play(0,0,0,0);
-  if ((xx>=padLeft)&&(yy>=padTop)&&(dx>=-18)&&(dx<=18)&&(dy<=22))
+  if((xx>=padLeft)&&(yy>=padTop)&&(dx>=-18)&&(dx<=18)&&(dy<=22))
   {
     doWon();
     wait(100);
     state=1;
-  } else
+  }
+  else
   {
     doCrash();
     wait(200);
@@ -226,14 +293,16 @@ static void doWon(void)
 static void doCrash(void)
 {
   int i;
-  gr_tplot( 8,2,"YOU DESTROYED THE CRAFT");
+  gr_tplot(8,2,"YOU DESTROYED THE CRAFT");
   explode();
   curset(xx+5,yy+3,3);
-  for(i=1;i<=6;i++) {
+  for(i=1; i<=6; i++)
+  {
     circle(i,1);
     wait(5);
   }
-  for(i=1;i<=6;i++) {
+  for(i=1; i<=6; i++)
+  {
     circle(i,0);
     wait(5);
   }
@@ -242,16 +311,19 @@ static void doCrash(void)
 
 static void checkHighScore(void)
 {
-  if(score>hiscore) {
+  if(score>hiscore)
+  {
     hiscore=score;
     showStatus();
-    gr_tplot( 8,2,"    NEW HIGH SCORE!    ");
-    zap();zap();zap();
+    gr_tplot(8,2,"    NEW HIGH SCORE!    ");
+    zap();
+    zap();
+    zap();
   }
 }
 
 static void wait(int n)
 {
   int i;
-  for(i=0;i<n*20;i++);
+  for(i=0; i<n*20; i++);
 }

@@ -18,6 +18,8 @@ PROJECT_DSK_EXCLUDE :=
 PROJECT_DSK_INCLUDE :=
 
 #
+EMU                 := emul8
+EMUDIR              :=
 EMUPARAM            := -ma
 # EMUPARAM            += --turbotape on
 # EMUPARAM            += --lightpen on

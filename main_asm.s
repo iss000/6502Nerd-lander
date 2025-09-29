@@ -26,6 +26,17 @@ atmp0   .dsb 2
 #define tmp0 atmp0
 #endif
 
+.bss
+
+__mgr_m  .dsb 2
+__mgr_x  .dsb 2
+__mgr_y  .dsb 2
+__mgr_s  .dsb 2
+
+#define _gr_pixmode __gr_pixmode
+#define _gr_hplot   __gr_hplot
+#define _gr_tplot   __gr_tplot
+#define _gr_plot   __gr_plot
 
 #include "dflat_library.s"
 
