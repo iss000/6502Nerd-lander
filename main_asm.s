@@ -22,7 +22,7 @@ atmp0         .dsb  2
 atmp0         .dsb  2
 #endif
 
-.bss
+.data
 
 __mgr_m       .dsb  2
 __mgr_x       .dsb  2

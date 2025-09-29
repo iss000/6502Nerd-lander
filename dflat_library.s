@@ -118,8 +118,8 @@ maskTableInit_skip
 
 ; Set the pixmode
 _gr_pixmode
-; 	ldy #0
-; 	lda (sp),y				; Access pixmode parameter
+;       ldy #0
+;       lda (sp),y                              ; Access pixmode parameter
               lda   __mgr_m
               sta   screenPixMode
               rts
@@ -137,8 +137,8 @@ _gr_plot
 
 ;           @ In text mode
 _gr_tplot
-; 	ldy #2
-; 	lda (sp),y				; Access Y coordinate
+;       ldy #2
+;       lda (sp),y                              ; Access Y coordinate
               lda   __mgr_y
               tax
               lda   screenMode
@@ -151,8 +151,8 @@ _gr_tplot
 tplot_skip_hires
               lda   textAddrLow,x       ; Get the LOW part of the screen adress
               clc                       ; Clear the carry (because we will do an addition after)
-; 	ldy #0
-; 	adc (sp),y				; Add X coordinate
+;       ldy #0
+;       adc (sp),y                              ; Add X coordinate
               adc   __mgr_x
               sta   write+1
               sta   plot_single_text_char+1
@@ -161,12 +161,12 @@ tplot_skip_hires
               sta   write+2
               sta   plot_single_text_char+2
 
-; 	ldy #4
-; 	lda (sp),y
+;       ldy #4
+;       lda (sp),y
               lda   __mgr_s
               sta   read+1
-; 	iny
-; 	lda (sp),y
+;       iny
+;       lda (sp),y
               lda   __mgr_s+1
               sta   read+2
               beq   single_text_char    ; If high byte is zero then only one char to plot
@@ -201,20 +201,20 @@ plot_single_text_char
 ; sp+4 => char code
 ;
 _gr_hplot
-; 	ldy #2
-; 	lda (sp),y				; Access Y coordinate
+;       ldy #2
+;       lda (sp),y                              ; Access Y coordinate
               lda   __mgr_y
               pha
-; 	ldy #0
-; 	lda (sp),y				; Access X coordinate
+;       ldy #0
+;       lda (sp),y                              ; Access X coordinate
               lda   __mgr_x
               pha
-; 	ldy #4
-; 	lda (sp),y				; Access char pointer
+;       ldy #4
+;       lda (sp),y                              ; Access char pointer
               lda   __mgr_s
               sta   tmp1
-; 	iny
-; 	lda (sp),y
+;       iny
+;       lda (sp),y
               lda   __mgr_m+1
               sta   tmp1+1
               pla
@@ -604,8 +604,8 @@ snd_set_reg
 .data
 
 kb_stick_mask
-              .byt  %11011111           ; Left 	= Bit 0
+              .byt  %11011111           ; Left  = Bit 0
               .byt  %01111111           ; Right = Bit 1
-              .byt  %11110111           ; Up	= Bit 2
-              .byt  %10111111           ; Down	= Bit 3
-              .byt  %11111110           ; Space	= Bit 4
+              .byt  %11110111           ; Up    = Bit 2
+              .byt  %10111111           ; Down  = Bit 3
+              .byt  %11111110           ; Space = Bit 4
