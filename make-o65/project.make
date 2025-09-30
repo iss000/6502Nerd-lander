@@ -18,8 +18,8 @@ PROJECT_DSK_EXCLUDE :=
 PROJECT_DSK_INCLUDE :=
 
 #
-# EMU                 := emul8
-# EMUDIR              :=
+EMU                 := emul8
+EMUDIR              :=
 EMUPARAM            := -ma
 # EMUPARAM            += --turbotape on
 # EMUPARAM            += --lightpen on
@@ -61,7 +61,7 @@ XXXFLAGS            += -DUSE_ROMCALLS
 
 # # #
 lander_SRC          := compat.s main.c main_asm.s trand.s xprintf.c
-lander_ORG          := 0x0600
+lander_ORG          := 0x0800
 lander_AUTO         := 1
 lander_NAME         :=
 lander_DEFS         :=
